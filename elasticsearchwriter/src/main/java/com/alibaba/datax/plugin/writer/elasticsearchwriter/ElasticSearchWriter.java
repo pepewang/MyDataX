@@ -327,6 +327,10 @@ public class ElasticSearchWriter extends Writer {
                             if (jo.getString("dynamic") != null) {
                                 field.put("dynamic", jo.getString("dynamic"));
                             }
+                            // 遇到NESTED嵌套复杂对象的情况，直接获取嵌套对象，然后转换为Object对象
+                            if (jo.getString("properties") != null) {
+                                field.put("properties", JSON.parse(jo.getString("properties")));
+                            }
                             break;
                         default:
                             break;
@@ -865,6 +869,8 @@ public class ElasticSearchWriter extends Writer {
                                         data.put(columnName, JSON.parse(column.asString()));
                                     }
                                     break;
+                                case WILDCARD:
+                                    data.put(columnName, column.asString());
                                 default:
                                 throw DataXException.asDataXException(ElasticSearchWriterErrorCode.BAD_CONFIG_VALUE, String.format(
                                         "Type error: unsupported type %s for column %s", columnType, columnName));
@@ -1066,6 +1072,7 @@ public class ElasticSearchWriter extends Writer {
             int index = -1;
             for (int i=0; i<record.getColumnNumber(); i++) {
                 Column column = record.getColumn(i);
+
                 String colName = columnList.get(i).getName();
                 if (StringUtils.isNotBlank(columnName) && colName.equals(columnName)) {
                     columns.add(column);

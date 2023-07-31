@@ -32,7 +32,8 @@ public enum ElasticSearchFieldType {
     COMPLETION,
     TOKEN_COUNT,
     OBJECT,
-    NESTED;
+    NESTED,
+    WILDCARD;
 
     public static ElasticSearchFieldType getESFieldType(String type) {
         if (type == null) {
